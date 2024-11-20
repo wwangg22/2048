@@ -97,7 +97,8 @@ class DQNAgent(nn.Module):
             next_qa_values = self.target_critic(next_obs)
 
             if self.use_double_q:
-                raise NotImplementedError
+                critic_qa_values = self.critic(next_obs)
+                next_action = torch.argmax(critic_qa_values, dim=1)
             else:
                 next_action = torch.argmax(next_qa_values, dim=1)
             # print(next_action.shape, next_qa_values.shape)
@@ -120,7 +121,7 @@ class DQNAgent(nn.Module):
         self.critic_optimizer.step()
 
         self.lr_scheduler.step()
-
+        # print("q_values mean ", q_values.mean())
         return {
             "critic_loss": loss.item(),
             "q_values": q_values.mean().item(),

@@ -9,7 +9,7 @@ class Game2048:
         self.grid = np.zeros((self.grid_size, self.grid_size), dtype=float)  # Use float
         self.add_new_tile()
         self.add_new_tile()
-        return self.grid.flatten()
+        return self.get_normalized_grid().flatten()
 
     def add_new_tile(self):
         empty_cells = list(zip(*np.where(self.grid == 0)))
@@ -84,20 +84,27 @@ class Game2048:
             for j in range(self.grid_size):
                 if self.grid[i, j] == self.grid[i + 1, j]:  # Adjacent vertical match
                     return False
-        # print("max value: ", np.max(self.grid))
         return True
+
+    def get_normalized_grid(self):
+        """
+        Normalize the grid using log2(tile value), with 0 for empty tiles.
+        """
+        normalized_grid = np.where(self.grid > 0, np.log2(self.grid), 0)
+        return normalized_grid
 
     def step(self, action):
         initial_grid = self.grid.copy()
         reward = self.move(action)
-        reward =0.05
         if not np.array_equal(initial_grid, self.grid):
             self.add_new_tile()
+        else:
+            reward = -0.2
 
         done = self.is_game_over()
         if done:
             reward += np.max(self.grid)
-        return self.grid.flatten(), reward, done
+        return self.get_normalized_grid().flatten(), reward, done
 
     def get_observation_space(self):
         # Returns the shape of the observation space (flattened grid)
@@ -113,11 +120,11 @@ if __name__ == "__main__":
     print("Observation Space:", game.get_observation_space())
     print("Input Space:", game.get_input_space())
     print("Initial State:")
-    print(game.grid)
+    print(game.get_normalized_grid())  # Display normalized grid
     done = False
     while not done:
         action = int(input("Enter action (0=Up, 1=Down, 2=Left, 3=Right): "))
         state, reward, done = game.step(action)
         print(f"Reward: {reward}")
-        print(state.reshape(4, 4))
+        print(state.reshape(4, 4))  # Display normalized grid
     print("Game Over!")

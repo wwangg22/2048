@@ -1,0 +1,25 @@
+Params:
+
+total_steps =500000
+start_learning = 5000
+batch_size = 200
+eval_interval=10000
+num_eval_traj = 10
+ep_len = 5000
+
+agent = DQNAgent(
+        observation_shape=game.get_observation_space(),
+        num_actions=game.get_input_space(),
+        num_layers=2,
+        hidden_size=1024,
+        learning_rate=1e-3,
+        discount=0.99,
+        target_update_period=1000,
+        use_double_q=True,
+        clip_grad_norm=None
+    )
+
+seed = 832
+mean reward of last run: -121.4,
+
+cost of useless step = -2
